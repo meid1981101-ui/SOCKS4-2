@@ -1,0 +1,32 @@
+name: Update SOCKS4 Proxy List
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Fetch and update proxies
+        run: |
+          curl -s "https://raw.githubusercontent.com/vmheaven/VMHeaven.io-Free-Proxy-List/refs/heads/main/socks4.txt" > all.txt
+          curl -s "https://raw.githubusercontent.com/Vann-Dev/proxy-list/main/proxies/socks4.txt" >> all.txt
+          curl -s "https://github.com/proxygenerator1/ProxyGenerator/raw/refs/heads/main/Unstable/socks4.txt" >> all.txt
+          curl -s "https://raw.githubusercontent.com/Zaeem20/FREE_PROXIES_LIST/master/socks4.txt" >> all.txt
+          curl -s "https://raw.githubusercontent.com/vakhov/fresh-proxy-list/master/socks4.txt" >> all.txt
+          sort -u all.txt -o all.txt
+
+      - name: Commit and push updated file
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add all.txt
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update SOCKS4 proxy list" && git push)
